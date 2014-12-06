@@ -39,7 +39,6 @@ var cameraPosition = {x: 0, y: 0}
 var resources = {}
 
 var grassHeights = []
-var sheeps = []
 
 function onGrid(width, height, fn) {
   return _.times(width, function(x) {
@@ -102,43 +101,72 @@ function Grid(width, height) {
 
   this.allocate = function(id, x, y) {
     this.positions[id] = new Position(id, x,y);
+    this.taken[x][y] = id;
     return this.positions[id];
+  };
+
+  this.deallocate = function(id) {
+    var pos = this.positions[id];
+    this.taken[pos.x][pos.y] = -1;
+    delete this.positions[id];
+  }
+}
+
+function Sprites(grid) {
+  this.fixed = {};
+  
+  this.render = function() {
+    _.each(this.fixed, function(img, id) {
+      var pos = grid.positions[id];
+      context.drawImage(img, pos.x * TILE_SIZE, pos.y * TILE_SIZE);
+    });
   };
 }
 
-var grid = new Grid(MAP_WIDTH, MAP_HEIGHT);
-
-function Sheep(position) {
-  var self = this
-
-  var id = nextEntity++;
-  var pos = grid.allocate(id, position.x, position.y);
-
-  self.render = function() {
-    context.drawImage(resources["sheep.png"], pos.x * TILE_SIZE, pos.y * TILE_SIZE)
+function Sheeps(sprites, grid) {
+  this.entities = [];
+  this.allocate = function(x, y) {
+    var id = nextEntity++;
+    this.entities.push(id);
+    var pos = grid.allocate(id, x, y);
+    sprites.fixed[id] = resources["sheep.png"];
+    return id;
   }
 
-  self.step = function() {
-    var x = pos.x, y = pos.y;
+  this.deallocate = function(id) {
+    delete entities[id];
+    delete sprites.fixed[id];
+    grid.deallocate(id);
+  }
 
-    // Eat the grass under the sheep
-    grassHeights[x][y] = Math.max(grassHeights[x][y] - EATING_RATE, 0)
+  this.step = function() {
+    _.each(this.entities, function(id) {
+      var pos = grid.positions[id]; 
+      var x = pos.x, y = pos.y;
 
-    // Possibly move the sheep
-    if (Math.random() < SHEEP_MOVE_LIKELIHOOD) {
-      var possiblePositions = ALLOWED_MOVES.map(function(offset) {
-        return {x: offset.x + x, y: offset.y + y}
-      }).filter(function(target) {
-        return pos.free(target.x, target.y);
-      })
+      // Eat the grass under the sheep
+      grassHeights[x][y] = Math.max(grassHeights[x][y] - EATING_RATE, 0)
 
-      var choice = rouletteSelection(possiblePositions, function(target) {
-        return grassHeights[target.x][target.y];
-      });
-      pos.move(choice.x, choice.y);
-    }
+      // Possibly move the sheep
+      if (Math.random() < SHEEP_MOVE_LIKELIHOOD) {
+        var possiblePositions = ALLOWED_MOVES.map(function(offset) {
+          return {x: offset.x + x, y: offset.y + y}
+        }).filter(function(target) {
+          return pos.free(target.x, target.y);
+        })
+
+        var choice = rouletteSelection(possiblePositions, function(target) {
+          return grassHeights[target.x][target.y];
+        });
+        pos.move(choice.x, choice.y);
+      }
+    });
   }
 }
+
+var grid = new Grid(MAP_WIDTH, MAP_HEIGHT);
+var sprites = new Sprites(grid);
+var sheeps = new Sheeps(sprites, grid);
 
 function loadImages() {
   IMAGES.forEach(function(fileName) {
@@ -152,7 +180,7 @@ function generateEntities(width, height) {
   var raw = _.sample(_.range(width * height), NUM_SHEEP);
   _.each(raw, function(p) {
     var position = { x: p % MAP_WIDTH, y: Math.floor(p / MAP_WIDTH) };
-    sheeps.push(new Sheep(position));
+    sheeps.allocate(position.x, position.y);
   });
 }
 
@@ -213,17 +241,16 @@ function gameRender() {
     for (var y = minY; y < maxY; y++) {
       var grassImage = "grass" + Math.floor(grassHeights[x][y]) + ".png"
       context.drawImage(resources[grassImage], x * TILE_SIZE, y * TILE_SIZE)
-
-      _.each(sheeps, function(sheep) { sheep.render(); });
     }
   }
+
+  sprites.render();
   context.restore()
   canvasDirty = false
 }
 
 function gameStep() {
-  sheeps.forEach(function(sheep) { sheep.step() })
-
+  sheeps.step();
   onGrid(MAP_WIDTH, MAP_HEIGHT, function(x,y) {
     grassHeights[x][y] = Math.min(grassHeights[x][y] + GROWING_RATE, GRASS_MAX_LEVEL)
   });
