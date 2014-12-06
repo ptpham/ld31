@@ -54,7 +54,7 @@ window.onload = function() {
             scheduleRefresh()
         }
 
-        canvas.onmouseup = function() {
+        canvas.onmouseleave = canvas.onmouseup = function() {
             canvas.onmousemove = null
         }
     }
