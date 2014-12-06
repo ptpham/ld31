@@ -15,7 +15,7 @@ var IMAGES = [
   "farmer.png"
 ]
 
-var GROWING_RATE = 0.1
+var GROWING_RATE = 0.0
 var GRASS_MAX_LEVEL = 3
 var NUM_SHEEP = 20
 
