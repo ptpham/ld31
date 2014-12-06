@@ -1,9 +1,12 @@
-var TILE_SIZE = 64
 var STEP_DELAY = 1000
+
+var TILE_SIZE = 64
 var CANVAS_WIDTH = 800
 var CANVAS_HEIGHT = 600
 var MAP_WIDTH = 20
 var MAP_HEIGHT = 20
+
+var RESOURCES_PREFIX = "resources/"
 var IMAGES = [
     "grass0.png", "grass1.png", "grass2.png", "grass3.png",
     "sheep.png"
@@ -13,6 +16,7 @@ var EATING_RATE = 0.4
 var GROWING_RATE = 0.1
 var GRASS_MAX_LEVEL = 3
 var SHEEP_MOVE_LIKELIHOOD = 0.1
+var NUM_SHEEP = 20
 
 var ALLOWED_MOVES = [
     {x: -1, y: -1},
@@ -26,32 +30,15 @@ var ALLOWED_MOVES = [
 ]
 
 var context = null
-var cameraPosition = {"x": 0, "y": 0}
-var grassHeights = []
-var resources = {}
 var canvasDirty = true
+
+var cameraPosition = {x: 0, y: 0}
+
+var resources = {}
+
+var grassHeights = []
 var sheeps = []
 var entities = []
-
-function clamp(num, min, max) {
-    return Math.max(Math.min(num, max), min)
-}
-
-function inBounds(position) {
-    return position.x >= 0 && position.x < MAP_WIDTH && position.y >= 0 && position.y < MAP_HEIGHT
-}
-
-function isEmpty(position) {
-    return entities[position.x][position.y] === null
-}
-
-function loadImages() {
-    for (var index in IMAGES) {
-        var newImage = new Image();
-        newImage.src = "resources/" + IMAGES[index]
-        resources[IMAGES[index]] = newImage
-    }
-}
 
 // Takes an array of possibilities and a function that returns the relative
 // weight of each option and returns the randomly selected option.
@@ -71,11 +58,6 @@ function rouletteSelection(options, weightFunction) {
     })
 
     return selected
-}
-
-function scheduleRefresh() {
-    canvasDirty = true
-    window.setTimeout(gameRender, 0)
 }
 
 function Sheep(position) {
@@ -107,7 +89,11 @@ function Sheep(position) {
         if (Math.random() < SHEEP_MOVE_LIKELIHOOD) {
             var possiblePositions = ALLOWED_MOVES.map(function(offset) {
                 return {x: offset.x + x, y: offset.y + y}
-            }).filter(inBounds).filter(isEmpty)
+            }).filter(function(pos) {
+                return pos.x >= 0 && pos.x < MAP_WIDTH && pos.y >= 0 && pos.y < MAP_HEIGHT
+            }).filter(function(pos) {
+                return entities[pos.x][pos.y] === null
+            })
 
             if (possiblePositions.length > 0) {
                 moveTo(rouletteSelection(possiblePositions, function(position) {
@@ -116,8 +102,14 @@ function Sheep(position) {
             }
         }
     }
+}
 
-    return self
+function loadImages() {
+    for (var index in IMAGES) {
+        var newImage = new Image()
+        newImage.src = RESOURCES_PREFIX + IMAGES[index]
+        resources[IMAGES[index]] = newImage
+    }
 }
 
 function generateEntities() {
@@ -132,7 +124,7 @@ function generateEntities() {
     }
 
     // Generate random sheep
-    for (var n = 0; n < 20; n++) {
+    for (var n = 0; n < NUM_SHEEP; n++) {
         do {
             var position = {
                 x: Math.floor(Math.random() * MAP_WIDTH),
@@ -154,7 +146,7 @@ function generateGrass() {
 }
 
 window.onload = function() {
-    window.onresize = scheduleRefresh
+    window.onresize = scheduleRender
     window.setInterval(gameStep, STEP_DELAY)
 
     var canvas = document.getElementById("gameCanvas")
@@ -170,10 +162,10 @@ window.onload = function() {
             lastX = event.clientX
             lastY = event.clientY
 
-            cameraPosition.x = clamp(cameraPosition.x, 0, TILE_SIZE * MAP_WIDTH - CANVAS_WIDTH)
-            cameraPosition.y = clamp(cameraPosition.y, 0, TILE_SIZE * MAP_HEIGHT - CANVAS_HEIGHT)
+            cameraPosition.x = Math.min(Math.max(cameraPosition.x, 0), TILE_SIZE * MAP_WIDTH - CANVAS_WIDTH)
+            cameraPosition.y = Math.min(Math.max(cameraPosition.y, 0), TILE_SIZE * MAP_HEIGHT - CANVAS_HEIGHT)
 
-            scheduleRefresh()
+            scheduleRender()
         }
 
         canvas.onmouseleave = canvas.onmouseup = function() {
@@ -186,7 +178,12 @@ window.onload = function() {
     generateGrass()
     generateEntities()
 
-    scheduleRefresh()
+    scheduleRender()
+}
+
+function scheduleRender() {
+    canvasDirty = true
+    window.setTimeout(gameRender, 0)
 }
 
 function gameRender() {
@@ -227,5 +224,5 @@ function gameStep() {
         }
     }
 
-    scheduleRefresh()
+    scheduleRender()
 }
