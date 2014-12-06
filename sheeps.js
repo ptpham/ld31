@@ -2,7 +2,7 @@ function Sheeps(sprites, grid) {
   var SHEEP_MOVE_LIKELIHOOD = 0.1
   var EATING_RATE = 0.4
 
-  this.entities = [];
+  this.entities = {};
   this.allocate = function(x, y) {
     var id = nextEntity++;
     this.entities[id] = {};

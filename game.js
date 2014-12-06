@@ -69,6 +69,7 @@ function Farmer(grid) {
 var grid = new Grid(MAP_WIDTH, MAP_HEIGHT);
 var sprites = new Sprites(TILE_SIZE, grid);
 var sheeps = new Sheeps(sprites, grid);
+var flowers = new Flowers(sheeps, sprites, grid);
 
 function loadImages() {
   IMAGES.forEach(function(fileName) {
@@ -84,17 +85,24 @@ function generateEntities(width, height) {
     var position = { x: p % width, y: Math.floor(p/width) };
     sheeps.allocate(position.x, position.y);
   });
+  _.times(40, function() {
+    var p = _.random(width*height);
+    flowers.allocate(p % width, Math.floor(p/width));
+  });
 }
 
 window.onload = function() {
+  window.onresize = scheduleRender
+  window.setInterval(gameStep, STEP_DELAY)
+  window.onkeydown = _.bind(farmer.handleKeyDown, farmer)
+  $(window).on("flowers:changed", function() {
+    flowerCount.innerHTML = flowers.alive;
+  });
+
   loadImages()
   grassHeights = generateGrass(MAP_WIDTH, MAP_HEIGHT)
   farmer = new Farmer(grid)
   generateEntities(MAP_WIDTH, MAP_HEIGHT)
-
-  window.onresize = scheduleRender
-  window.setInterval(gameStep, STEP_DELAY)
-  window.onkeydown = _.bind(farmer.handleKeyDown, farmer)
 
   var canvas = document.getElementById("gameCanvas")
   context = canvas.getContext("2d")
@@ -143,6 +151,7 @@ function gameRender() {
 
 function gameStep() {
   sheeps.step();
+  flowers.step();
   onGrid(MAP_WIDTH, MAP_HEIGHT, function(x,y) {
     grassHeights[x][y] = Math.min(grassHeights[x][y] + GROWING_RATE, GRASS_MAX_LEVEL)
   });
