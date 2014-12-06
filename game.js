@@ -45,9 +45,9 @@ function loadImages() {
 }
 
 function generateEntities(width, height) {
-  var raw = _.sample(_.range(width * height), NUM_SHEEP);
+  var raw = _.sample(_.range(width*height), NUM_SHEEP);
   _.each(raw, function(p) {
-    var position = { x: p % MAP_WIDTH, y: Math.floor(p / MAP_WIDTH) };
+    var position = { x: p % width, y: Math.floor(p/width) };
     sheeps.allocate(position.x, position.y);
   });
 }
