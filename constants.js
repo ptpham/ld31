@@ -10,6 +10,7 @@ var RESOURCES_PREFIX = "resources/"
 
 var IMAGES = [
   "grass0.png", "grass1.png", "grass2.png", "grass3.png",
+  "flower_blue.png",
   "sheep.png",
   "farmer.png"
 ]

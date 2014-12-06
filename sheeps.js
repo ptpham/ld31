@@ -5,7 +5,7 @@ function Sheeps(sprites, grid) {
   this.entities = [];
   this.allocate = function(x, y) {
     var id = nextEntity++;
-    this.entities.push(id);
+    this.entities[id] = {};
     var pos = grid.allocate(id, x, y);
     sprites.fixed[id] = resources["sheep.png"];
     return id;
@@ -18,7 +18,7 @@ function Sheeps(sprites, grid) {
   }
 
   this.step = function() {
-    _.each(this.entities, function(id) {
+    _.each(this.entities, function(sheep, id) {
       var pos = grid.positions[id]; 
       var x = pos.x, y = pos.y;
 
