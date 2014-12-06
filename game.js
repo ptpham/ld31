@@ -11,6 +11,7 @@ var context = null
 var cameraPosition = {"x": 0, "y": 0}
 var grassHeights = []
 var resources = {}
+var canvasDirty = true
 
 function clamp(num, min, max) {
     return Math.max(Math.min(num, max), min)
@@ -25,8 +26,13 @@ function loadImages() {
     console.log(resources)
 }
 
+function scheduleRefresh() {
+    canvasDirty = true
+    window.setTimeout(gameRender, 0)
+}
+
 window.onload = function() {
-    window.onresize = gameRender
+    window.onresize = scheduleRefresh
     window.setInterval(gameStep, STEP_DELAY)
 
     var canvas = document.getElementById("gameCanvas")
@@ -45,7 +51,7 @@ window.onload = function() {
             cameraPosition.x = clamp(cameraPosition.x, 0, TILE_SIZE * MAP_WIDTH - CANVAS_WIDTH)
             cameraPosition.y = clamp(cameraPosition.y, 0, TILE_SIZE * MAP_HEIGHT - CANVAS_HEIGHT)
 
-            gameRender()
+            scheduleRefresh()
         }
 
         canvas.onmouseup = function() {
@@ -63,10 +69,16 @@ window.onload = function() {
 
     loadImages()
 
-    gameRender()
+    scheduleRefresh()
 }
 
 function gameRender() {
+    if (canvasDirty) {
+        canvasDirty = false
+    } else {
+        return
+    }
+
     var minX = Math.floor(cameraPosition.x / TILE_SIZE)
     var minY = Math.floor(cameraPosition.y / TILE_SIZE)
     var maxX = Math.ceil((cameraPosition.x + CANVAS_WIDTH) / TILE_SIZE)
