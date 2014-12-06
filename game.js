@@ -103,11 +103,11 @@ function Sheep(position) {
 }
 
 function loadImages() {
-    for (var index in IMAGES) {
+    IMAGES.forEach(function(fileName) {
         var newImage = new Image()
-        newImage.src = RESOURCES_PREFIX + IMAGES[index]
-        resources[IMAGES[index]] = newImage
-    }
+        newImage.src = RESOURCES_PREFIX + fileName
+        resources[fileName] = newImage
+    })
 }
 
 function generateEntities() {
@@ -212,9 +212,9 @@ function gameRender() {
 }
 
 function gameStep() {
-    for (var sheep in sheeps) {
-        sheeps[sheep].step()
-    }
+    sheeps.forEach(function(sheep) {
+        sheep.step()
+    })
 
     for (var x = 0; x < MAP_WIDTH; x++) {
         for (var y = 0; y < MAP_HEIGHT; y++) {
