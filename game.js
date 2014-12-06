@@ -90,9 +90,7 @@ function Sheep(position) {
             var possiblePositions = ALLOWED_MOVES.map(function(offset) {
                 return {x: offset.x + x, y: offset.y + y}
             }).filter(function(pos) {
-                return pos.x >= 0 && pos.x < MAP_WIDTH && pos.y >= 0 && pos.y < MAP_HEIGHT
-            }).filter(function(pos) {
-                return entities[pos.x][pos.y] === null
+                return pos.x >= 0 && pos.x < MAP_WIDTH && pos.y >= 0 && pos.y < MAP_HEIGHT && entities[pos.x][pos.y] === null
             })
 
             if (possiblePositions.length > 0) {
