@@ -12,6 +12,18 @@ var IMAGES = [
 var EATING_RATE = 0.4
 var GROWING_RATE = 0.1
 var GRASS_MAX_LEVEL = 3
+var SHEEP_MOVE_LIKELIHOOD = 0.1
+
+var ALLOWED_MOVES = [
+    {x: -1, y: -1},
+    {x: -1, y: 0},
+    {x: -1, y: 1},
+    {x: 0, y: -1},
+    {x: 0, y: 1},
+    {x: 1, y: -1},
+    {x: 1, y: 0},
+    {x: 1, y: 1}
+]
 
 var context = null
 var cameraPosition = {"x": 0, "y": 0}
@@ -25,12 +37,40 @@ function clamp(num, min, max) {
     return Math.max(Math.min(num, max), min)
 }
 
+function inBounds(position) {
+    return position.x >= 0 && position.x < MAP_WIDTH && position.y >= 0 && position.y < MAP_HEIGHT
+}
+
+function isEmpty(position) {
+    return entities[position.x][position.y] === null
+}
+
 function loadImages() {
-    for (index in IMAGES) {
+    for (var index in IMAGES) {
         var newImage = new Image();
         newImage.src = "resources/" + IMAGES[index]
         resources[IMAGES[index]] = newImage
     }
+}
+
+// Takes an array of possibilities and a function that returns the relative
+// weight of each option and returns the randomly selected option.
+function rouletteSelection(options, weightFunction) {
+    var summedWeight = 0
+    options.forEach(function(option) {
+        summedWeight += weightFunction(option)
+    })
+
+    var selector = Math.random() * summedWeight
+    var selected
+    options.forEach(function(option) {
+        if (selector >= 0) {
+            selected = option
+        }
+        selector -= weightFunction(option)
+    })
+
+    return selected
 }
 
 function scheduleRefresh() {
@@ -44,8 +84,16 @@ function Sheep(position) {
     self.position = position
     entities[position.x][position.y] = self
 
+    var moveTo = function(position) {
+        entities[self.position.x][self.position.y] = null
+        self.position = position
+        entities[position.x][position.y] = self
+    }
+
     self.render = function() {
-        context.drawImage(resources["sheep.png"], position.x * TILE_SIZE, position.y * TILE_SIZE)
+        var x = self.position.x
+        var y = self.position.y
+        context.drawImage(resources["sheep.png"], x * TILE_SIZE, y * TILE_SIZE)
     }
 
     self.step = function() {
@@ -54,6 +102,19 @@ function Sheep(position) {
 
         // Eat the grass under the sheep
         grassHeights[x][y] = Math.max(grassHeights[x][y] - EATING_RATE, 0)
+
+        // Possibly move the sheep
+        if (Math.random() < SHEEP_MOVE_LIKELIHOOD) {
+            var possiblePositions = ALLOWED_MOVES.map(function(offset) {
+                return {x: offset.x + x, y: offset.y + y}
+            }).filter(inBounds).filter(isEmpty)
+
+            if (possiblePositions.length > 0) {
+                moveTo(rouletteSelection(possiblePositions, function(position) {
+                    return grassHeights[position.x][position.y]
+                }))
+            }
+        }
     }
 
     return self
@@ -156,7 +217,7 @@ function gameRender() {
 }
 
 function gameStep() {
-    for (sheep in sheeps) {
+    for (var sheep in sheeps) {
         sheeps[sheep].step()
     }
 
