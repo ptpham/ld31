@@ -18,8 +18,7 @@ function rouletteSelection(options, weightFunction) {
   var weights = _.map(options, weightFunction);
   _.times(weights.length - 1, function(i) { weights[i+1] += weights[i]; });
   var selector = Math.random() * _.last(weights);
-  var result = options[_.sortedIndex(weights, selector)];
-  return result;
+  return options[_.sortedIndex(weights, selector)];
 }
 
 function Sprites(size, grid) {
