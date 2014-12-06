@@ -82,6 +82,16 @@ function generateEntities() {
     }
 }
 
+function generateGrass() {
+    for (var x = 0; x < MAP_WIDTH; x++) {
+        var column = []
+        for (var y = 0; y < MAP_HEIGHT; y++) {
+            column.push(Math.min(Math.random() * (GRASS_MAX_LEVEL + 1), GRASS_MAX_LEVEL))
+        }
+        grassHeights.push(column)
+    }
+}
+
 window.onload = function() {
     window.onresize = scheduleRefresh
     window.setInterval(gameStep, STEP_DELAY)
@@ -110,16 +120,9 @@ window.onload = function() {
         }
     }
 
-    for (var x = 0; x < MAP_WIDTH; x++) {
-        var column = []
-        for (var y = 0; y < MAP_HEIGHT; y++) {
-            column.push(Math.random() * (GRASS_MAX_LEVEL + 1))
-        }
-        grassHeights.push(column)
-    }
-
     loadImages()
 
+    generateGrass()
     generateEntities()
 
     scheduleRefresh()
