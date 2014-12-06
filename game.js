@@ -1,64 +1,15 @@
-var STEP_DELAY = 1000
-
-var TILE_SIZE = 64
-var CANVAS_WIDTH = 800
-var CANVAS_HEIGHT = 600
-var MAP_WIDTH = 20
-var MAP_HEIGHT = 20
-
-var RESOURCES_PREFIX = "resources/"
-
-var IMAGES = [
-  "grass0.png", "grass1.png", "grass2.png", "grass3.png",
-  "sheep.png"
-]
-
-var EATING_RATE = 0.4
-var GROWING_RATE = 0.1
-var GRASS_MAX_LEVEL = 3
-var SHEEP_MOVE_LIKELIHOOD = 0.1
-var NUM_SHEEP = 20
-
-var ALLOWED_MOVES = [
-  {x: -1, y: -1},
-  {x: -1, y: 0},
-  {x: -1, y: 1},
-  {x: 0, y: -1},
-  {x: 0, y: 1},
-  {x: 1, y: -1},
-  {x: 1, y: 0},
-  {x: 1, y: 1}
-]
-
 var context = null
 var canvasDirty = true
 var nextEntity = 0;
 
 var cameraPosition = {x: 0, y: 0}
-
 var resources = {}
-
 var grassHeights = []
-
-function onGrid(width, height, fn) {
-  return _.times(width, function(x) {
-    return _.times(height, function(y) { return fn(x,y) })
-  })
-}
-
-function constantGrid(width, height, constant) {
-  return onGrid(width, height, _.constant(constant))
-}
 
 function generateGrass(width, height) {
   return onGrid(width, height, function() {
     return _.random(0, GRASS_MAX_LEVEL)
   })
-}
-
-function clamp(value, min, max) {
-  if (min > max) return min;
-  return Math.min(Math.max(value, min), max);
 }
 
 // Takes an array of possibilities and a function that returns the relative
@@ -71,101 +22,18 @@ function rouletteSelection(options, weightFunction) {
   return result;
 }
 
-function Grid(width, height) {
-  this.width = width;
-  this.height = height;
-  this.taken = constantGrid(width, height, -1);
-  this.positions = {};
-
-  var grid = this;
-  function Position(id, x, y) {
-    this.x = x;
-    this.y = y;
-    this.move = function(x, y) {
-      if (this.x >= 0 && this.x < width &&
-        this.y >= 0 && this.y < height) {
-        grid.taken[this.x][this.y] = -1;
-      }
-
-      this.x = x;
-      this.y = y;
-      grid.taken[x][y] = id;
-    }
-
-    this.free = function(x, y) {
-      if (x < 0 || y < 0 || x >= width || y >= height) return false;
-      var taken = grid.taken[x][y];
-      return taken < 0 || taken == id;
-    }
-  }
-
-  this.allocate = function(id, x, y) {
-    this.positions[id] = new Position(id, x,y);
-    this.taken[x][y] = id;
-    return this.positions[id];
-  };
-
-  this.deallocate = function(id) {
-    var pos = this.positions[id];
-    this.taken[pos.x][pos.y] = -1;
-    delete this.positions[id];
-  }
-}
-
-function Sprites(grid) {
+function Sprites(size, grid) {
   this.fixed = {};
-  
   this.render = function() {
     _.each(this.fixed, function(img, id) {
       var pos = grid.positions[id];
-      context.drawImage(img, pos.x * TILE_SIZE, pos.y * TILE_SIZE);
+      context.drawImage(img, size * pos.x, size * pos.y);
     });
   };
 }
 
-function Sheeps(sprites, grid) {
-  this.entities = [];
-  this.allocate = function(x, y) {
-    var id = nextEntity++;
-    this.entities.push(id);
-    var pos = grid.allocate(id, x, y);
-    sprites.fixed[id] = resources["sheep.png"];
-    return id;
-  }
-
-  this.deallocate = function(id) {
-    delete entities[id];
-    delete sprites.fixed[id];
-    grid.deallocate(id);
-  }
-
-  this.step = function() {
-    _.each(this.entities, function(id) {
-      var pos = grid.positions[id]; 
-      var x = pos.x, y = pos.y;
-
-      // Eat the grass under the sheep
-      grassHeights[x][y] = Math.max(grassHeights[x][y] - EATING_RATE, 0)
-
-      // Possibly move the sheep
-      if (Math.random() < SHEEP_MOVE_LIKELIHOOD) {
-        var possiblePositions = ALLOWED_MOVES.map(function(offset) {
-          return {x: offset.x + x, y: offset.y + y}
-        }).filter(function(target) {
-          return pos.free(target.x, target.y);
-        })
-
-        var choice = rouletteSelection(possiblePositions, function(target) {
-          return grassHeights[target.x][target.y];
-        });
-        pos.move(choice.x, choice.y);
-      }
-    });
-  }
-}
-
 var grid = new Grid(MAP_WIDTH, MAP_HEIGHT);
-var sprites = new Sprites(grid);
+var sprites = new Sprites(TILE_SIZE, grid);
 var sheeps = new Sheeps(sprites, grid);
 
 function loadImages() {
