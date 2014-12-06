@@ -70,6 +70,7 @@ var grid = new Grid(MAP_WIDTH, MAP_HEIGHT);
 var sprites = new Sprites(TILE_SIZE, grid);
 var sheeps = new Sheeps(sprites, grid);
 var flowers = new Flowers(sheeps, sprites, grid);
+var farmer = new Farmer(grid)
 
 function loadImages() {
   IMAGES.forEach(function(fileName) {
@@ -101,7 +102,6 @@ window.onload = function() {
 
   loadImages()
   grassHeights = generateGrass(MAP_WIDTH, MAP_HEIGHT)
-  farmer = new Farmer(grid)
   generateEntities(MAP_WIDTH, MAP_HEIGHT)
 
   var canvas = document.getElementById("gameCanvas")
