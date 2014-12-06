@@ -71,7 +71,10 @@ window.onload = function() {
     if (event.keyCode == 38) y--;
     if (event.keyCode == 39) x++;
     if (event.keyCode == 40) y++;
-    if (farmerPos.free(x,y)) farmerPos.move(x,y);
+    if (farmerPos.free(x,y)) {
+      farmerPos.move(x,y);
+      scheduleRender();
+    }
   }
 
   var mousedown = false, lastX, lastY;
