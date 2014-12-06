@@ -48,6 +48,11 @@ function Grid(width, height) {
     this.taken[pos.x][pos.y] = -1;
     delete this.positions[id];
   }
+
+  this.at = function(x, y) {
+    if (x < 0 || y < 0 || x >= width || y >= height) return null;
+    return this.taken[x][y]
+  }
 }
 
 

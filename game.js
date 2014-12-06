@@ -37,16 +37,32 @@ function Farmer(grid) {
   this.position = grid.allocate(this.entity, 0, 0);
   sprites.fixed[this.entity] = resources["farmer.png"];
 
-  this.handleKeyDown = function(event) {
-    var x = this.position.x, y = this.position.y;
-    if (event.keyCode == 37) x--;
-    if (event.keyCode == 38) y--;
-    if (event.keyCode == 39) x++;
-    if (event.keyCode == 40) y++;
-    if (this.position.free(x,y)) {
-      this.position.move(x,y);
-      scheduleRender();
+  var farmer = this
+  var moveTo = function(offX, offY) {
+    var x = farmer.position.x + offX
+    var y = farmer.position.y + offY
+    if (farmer.position.free(x, y)) {
+      farmer.position.move(x, y);
+      scheduleRender()
+    } else {
+      var entity = grid.at(x, y);
+      var entityPos = grid.positions[entity]
+      if (entityPos.free(x + offX, y + offY)) {
+        entityPos.move(x + offX, y + offY)
+        farmer.position.move(x, y)
+        scheduleRender()
+      }
     }
+  }
+
+  this.handleKeyDown = function(event) {
+    var offX = 0, offY = 0;
+    if (event.keyCode == 37) offX = -1;
+    if (event.keyCode == 38) offY = -1;
+    if (event.keyCode == 39) offX = 1;
+    if (event.keyCode == 40) offY = 1;
+
+    if (offX != 0 || offY != 0) moveTo(offX, offY)
   }
 }
 
