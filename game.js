@@ -7,6 +7,7 @@ var MAP_WIDTH = 20
 var MAP_HEIGHT = 20
 
 var RESOURCES_PREFIX = "resources/"
+
 var IMAGES = [
     "grass0.png", "grass1.png", "grass2.png", "grass3.png",
     "sheep.png"
@@ -40,24 +41,35 @@ var grassHeights = []
 var sheeps = []
 var entities = []
 
+function onGrid(width, height, fn) {
+    return _.times(width, function(x) {
+        return _.times(height, function(y) { return fn(x,y) })
+    })
+}
+
+function constantGrid(width, height, constant) {
+    return onGrid(width, height, _.constant(constant))
+}
+
+function generateGrass(width, height) {
+    return onGrid(width, height, function() {
+        return _.random(0, GRASS_MAX_LEVEL)
+    })
+}
+
+function clamp(value, min, max) {
+  if (min > max) return min;
+  return Math.min(Math.max(value, min), max);
+}
+
 // Takes an array of possibilities and a function that returns the relative
 // weight of each option and returns the randomly selected option.
 function rouletteSelection(options, weightFunction) {
-    var summedWeight = 0
-    options.forEach(function(option) {
-        summedWeight += weightFunction(option)
-    })
-
-    var selector = Math.random() * summedWeight
-    var selected
-    options.forEach(function(option) {
-        if (selector >= 0) {
-            selected = option
-        }
-        selector -= weightFunction(option)
-    })
-
-    return selected
+    var weights = _.map(options, weightFunction);
+    _.times(weights.length - 1, function(i) { weights[i+1] += weights[i]; });
+    var selector = Math.random() * _.last(weights);
+    var result = options[_.sortedIndex(weights, selector)];
+    return result;
 }
 
 function Sheep(position) {
@@ -67,6 +79,7 @@ function Sheep(position) {
     entities[position.x][position.y] = self
 
     var moveTo = function(position) {
+        if (!position) return;
         entities[self.position.x][self.position.y] = null
         self.position = position
         entities[position.x][position.y] = self
@@ -93,11 +106,9 @@ function Sheep(position) {
                 return pos.x >= 0 && pos.x < MAP_WIDTH && pos.y >= 0 && pos.y < MAP_HEIGHT && entities[pos.x][pos.y] === null
             })
 
-            if (possiblePositions.length > 0) {
-                moveTo(rouletteSelection(possiblePositions, function(position) {
-                    return grassHeights[position.x][position.y]
-                }))
-            }
+            moveTo(rouletteSelection(possiblePositions, function(position) {
+                return grassHeights[position.x][position.y]
+            }))
         }
     }
 }
@@ -110,37 +121,13 @@ function loadImages() {
     })
 }
 
-function generateEntities() {
-
-    // Make entities a 2D null array of MAP_WIDTH by MAP_HEIGHT
-    for (var x = 0; x < MAP_WIDTH; x++) {
-        var column = []
-        for (var y = 0; y < MAP_HEIGHT; y++) {
-            column.push(null)
-        }
-        entities.push(column)
-    }
-
-    // Generate random sheep
-    for (var n = 0; n < NUM_SHEEP; n++) {
-        do {
-            var position = {
-                x: Math.floor(Math.random() * MAP_WIDTH),
-                y: Math.floor(Math.random() * MAP_HEIGHT)
-            }
-        } while(entities[position.x][position.y] !== null)
-        sheeps.push(new Sheep(position))
-    }
-}
-
-function generateGrass() {
-    for (var x = 0; x < MAP_WIDTH; x++) {
-        var column = []
-        for (var y = 0; y < MAP_HEIGHT; y++) {
-            column.push(Math.min(Math.random() * (GRASS_MAX_LEVEL + 1), GRASS_MAX_LEVEL))
-        }
-        grassHeights.push(column)
-    }
+function generateEntities(width, height) {
+    entities = constantGrid(width, height, null);
+    var raw = _.sample(_.range(width * height), NUM_SHEEP);
+    _.each(raw, function(p) {
+      var position = { x: p % MAP_WIDTH, y: Math.floor(p / MAP_WIDTH) };
+      sheeps.push(new Sheep(position));
+    });
 }
 
 window.onload = function() {
@@ -150,31 +137,34 @@ window.onload = function() {
     var canvas = document.getElementById("gameCanvas")
     context = canvas.getContext("2d")
 
+    var mousedown = false, lastX, lastY;
     canvas.onmousedown = function(event) {
-        var lastX = event.clientX
-        var lastY = event.clientY
-
-        canvas.onmousemove = function(event) {
-            cameraPosition.x += (lastX - event.clientX)
-            cameraPosition.y += (lastY - event.clientY)
-            lastX = event.clientX
-            lastY = event.clientY
-
-            cameraPosition.x = Math.min(Math.max(cameraPosition.x, 0), TILE_SIZE * MAP_WIDTH - CANVAS_WIDTH)
-            cameraPosition.y = Math.min(Math.max(cameraPosition.y, 0), TILE_SIZE * MAP_HEIGHT - CANVAS_HEIGHT)
-
-            scheduleRender()
-        }
-
-        canvas.onmouseleave = canvas.onmouseup = function() {
-            canvas.onmousemove = null
-        }
+        lastX = event.clientX;
+        lastY = event.clientY;
+        mousedown = true;
     }
+
+    canvas.onmousemove = function(event) {
+        if (!mousedown) return;
+        cameraPosition.x += (lastX - event.clientX);
+        cameraPosition.y += (lastY - event.clientY);
+        lastX = event.clientX;
+        lastY = event.clientY;
+
+        cameraPosition.x = clamp(cameraPosition.x, 0,
+          TILE_SIZE * MAP_WIDTH - CANVAS_WIDTH);
+        cameraPosition.y = clamp(cameraPosition.y, 0,
+          TILE_SIZE * MAP_HEIGHT - CANVAS_HEIGHT);
+
+        scheduleRender();
+    }
+
+    canvas.onmouseleave = canvas.onmouseup = function() { mousedown = false; }
 
     loadImages()
 
-    generateGrass()
-    generateEntities()
+    grassHeights = generateGrass(MAP_WIDTH, MAP_HEIGHT)
+    generateEntities(MAP_WIDTH, MAP_HEIGHT)
 
     scheduleRender()
 }
@@ -185,18 +175,14 @@ function scheduleRender() {
 }
 
 function gameRender() {
-    if (canvasDirty) {
-        canvasDirty = false
-    } else {
-        return
-    }
-
-    var minX = Math.floor(cameraPosition.x / TILE_SIZE)
-    var minY = Math.floor(cameraPosition.y / TILE_SIZE)
-    var maxX = Math.ceil((cameraPosition.x + CANVAS_WIDTH) / TILE_SIZE)
-    var maxY = Math.ceil((cameraPosition.y + CANVAS_HEIGHT) / TILE_SIZE)
+    if (!canvasDirty) return;
+    var minX = Math.max(Math.floor(cameraPosition.x / TILE_SIZE), 0);
+    var minY = Math.max(Math.floor(cameraPosition.y / TILE_SIZE), 0);
+    var maxX = Math.min(Math.ceil((cameraPosition.x + CANVAS_WIDTH) / TILE_SIZE), MAP_WIDTH);
+    var maxY = Math.min(Math.ceil((cameraPosition.y + CANVAS_HEIGHT) / TILE_SIZE),  MAP_HEIGHT);
 
     context.save()
+    context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     context.translate(-cameraPosition.x, -cameraPosition.y)
     for (var x = minX; x < maxX; x++) {
         for (var y = minY; y < maxY; y++) {
@@ -209,18 +195,15 @@ function gameRender() {
         }
     }
     context.restore()
+    canvasDirty = false
 }
 
 function gameStep() {
-    sheeps.forEach(function(sheep) {
-        sheep.step()
-    })
+    sheeps.forEach(function(sheep) { sheep.step() })
 
-    for (var x = 0; x < MAP_WIDTH; x++) {
-        for (var y = 0; y < MAP_HEIGHT; y++) {
-            grassHeights[x][y] = Math.min(grassHeights[x][y] + GROWING_RATE, GRASS_MAX_LEVEL)
-        }
-    }
+    onGrid(MAP_WIDTH, MAP_HEIGHT, function(x,y) {
+        grassHeights[x][y] = Math.min(grassHeights[x][y] + GROWING_RATE, GRASS_MAX_LEVEL)
+    });
 
     scheduleRender()
 }
