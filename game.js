@@ -5,11 +5,24 @@ var CANVAS_HEIGHT = 600
 var MAP_WIDTH = 20
 var MAP_HEIGHT = 20
 
+var IMAGES = ["grass0.png", "grass1.png", "grass2.png", "grass3.png"]
+
 var context = null
 var cameraPosition = {"x": 0, "y": 0}
+var grassHeights = []
+var resources = {}
 
 function clamp(num, min, max) {
     return Math.max(Math.min(num, max), min)
+}
+
+function loadImages() {
+    for (index in IMAGES) {
+        var newImage = new Image();
+        newImage.src = "resources/" + IMAGES[index]
+        resources[IMAGES[index]] = newImage
+    }
+    console.log(resources)
 }
 
 window.onload = function() {
@@ -40,12 +53,34 @@ window.onload = function() {
         }
     }
 
+    for (var x = 0; x < MAP_WIDTH; x++) {
+        var column = []
+        for (var y = 0; y < MAP_HEIGHT; y++) {
+            column.push(Math.floor(Math.random() * 4))
+        }
+        grassHeights.push(column)
+    }
+
+    loadImages()
+
     gameRender()
 }
 
 function gameRender() {
-    context.fillStyle = "black"
-    context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+    var minX = Math.floor(cameraPosition.x / TILE_SIZE)
+    var minY = Math.floor(cameraPosition.y / TILE_SIZE)
+    var maxX = Math.ceil((cameraPosition.x + CANVAS_WIDTH) / TILE_SIZE)
+    var maxY = Math.ceil((cameraPosition.y + CANVAS_HEIGHT) / TILE_SIZE)
+
+    context.save()
+    context.translate(-cameraPosition.x, -cameraPosition.y)
+    for (var x = minX; x < maxX; x++) {
+        for (var y = minY; y < maxY; y++) {
+            var grassImage = "grass" + grassHeights[x][y] + ".png"
+            context.drawImage(resources[grassImage], x * TILE_SIZE, y * TILE_SIZE)
+        }
+    }
+    context.restore()
 }
 
 function gameStep() {
