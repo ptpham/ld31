@@ -63,6 +63,18 @@ window.onload = function() {
   var canvas = document.getElementById("gameCanvas")
   context = canvas.getContext("2d")
 
+  var farmer = nextEntity++;
+  var farmerPos = grid.allocate(farmer, 0, 0);
+  sprites.fixed[farmer] = resources["farmer.png"];
+  window.onkeydown = function(event) {
+    var x = farmerPos.x, y = farmerPos.y;
+    if (event.keyCode == 37) x--;
+    if (event.keyCode == 38) y--;
+    if (event.keyCode == 39) x++;
+    if (event.keyCode == 40) y++;
+    if (farmerPos.free(x,y)) farmerPos.move(x,y);
+  }
+
   var mousedown = false, lastX, lastY;
   canvas.onmousedown = function(event) {
     lastX = event.clientX;
