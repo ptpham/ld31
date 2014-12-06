@@ -23,19 +23,41 @@ function rouletteSelection(options, weightFunction) {
 }
 
 function Sprites(size, grid) {
-  this.fixed = {};
+  this.fixed = [];
+  this.fixedLayers = { };
+
   this.render = function() {
-    _.each(this.fixed, function(img, id) {
-      var pos = grid.positions[id];
-      context.drawImage(img, size * pos.x, size * pos.y);
+    _.each(this.fixed, function(layer) {
+      _.each(layer, function(img, id) {
+        var pos = grid.positions[id];
+        context.drawImage(resources[img], size * pos.x, size * pos.y);
+      });
     });
   };
+  
+  this.ensureLayer = function(layer) {
+    while (this.fixed.length <= layer) this.fixed.push({});
+  }
+  
+  this.addFixed = function(id, img, layer) {
+    this.ensureLayer(layer);
+    this.fixed[layer][id] = img;
+    this.fixedLayers[id] = layer;
+  }
+
+  this.removeFixed = function(id) {
+    var layer = this.fixedLayers[id];
+    if (layer === undefined) return;
+    this.ensureLayer(layer);
+    delete this.fixed[layer][id];
+    delete this.fixedLayers[id];
+  }
 }
 
-function Farmer(grid) {
+function Farmer(sprites, grid) {
   this.entity = nextEntity++;
   this.position = grid.allocate(this.entity, 0, 0);
-  sprites.fixed[this.entity] = resources["farmer.png"];
+  sprites.addFixed(this.entity, "farmer.png", 4);
 
   var farmer = this
   var moveTo = function(offX, offY) {
@@ -70,7 +92,7 @@ var grid = new Grid(MAP_WIDTH, MAP_HEIGHT);
 var sprites = new Sprites(TILE_SIZE, grid);
 var sheeps = new Sheeps(sprites, grid);
 var flowers = new Flowers(sheeps, sprites, grid);
-var farmer = new Farmer(grid)
+var farmer = new Farmer(sprites, grid)
 
 function loadImages() {
   IMAGES.forEach(function(fileName) {
@@ -100,7 +122,7 @@ window.onload = function() {
     flowerCount.innerHTML = flowers.alive;
   });
 
-  loadImages()
+  loadImages();
   grassHeights = generateGrass(MAP_WIDTH, MAP_HEIGHT)
   generateEntities(MAP_WIDTH, MAP_HEIGHT)
 

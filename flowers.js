@@ -7,7 +7,7 @@ function Flowers(sheeps, sprites, grid) {
   this.allocate = function(x, y) {
     var id = nextEntity++;
     this.entities[id] = { };
-    sprites.fixed[id] = resources["flower_blue.png"];
+    sprites.addFixed(id, "flower_blue.png", 0);
     grid.positions[id] = { x: x, y: y };
     this.alive++;
     $(window).trigger("flowers:changed");
@@ -16,8 +16,8 @@ function Flowers(sheeps, sprites, grid) {
 
   this.deallocate = function(id) {
     delete this.entities[id];
-    delete sprites.fixed[id];
     delete grid.positions[id];
+    sprites.removeFixed(id);
     this.alive--;
     $(window).trigger("flowers:changed");
   }

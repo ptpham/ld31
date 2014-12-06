@@ -7,13 +7,13 @@ function Sheeps(sprites, grid) {
     var id = nextEntity++;
     this.entities[id] = {};
     var pos = grid.allocate(id, x, y);
-    sprites.fixed[id] = resources["sheep.png"];
+    sprites.addFixed(id, "sheep.png", 4);
     return id;
   }
 
   this.deallocate = function(id) {
     delete entities[id];
-    delete sprites.fixed[id];
+    sprites.removeFixed(id);
     grid.deallocate(id);
   }
 
