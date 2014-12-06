@@ -63,7 +63,6 @@ function Farmer(sprites, grid) {
   var moveTo = function(offX, offY) {
     var x = farmer.position.x + offX
     var y = farmer.position.y + offY
-    if (!grid.inBounds(x,y)) return;
 
     // Push out entities
     if (grid.hasEntity(x, y)) {
@@ -74,7 +73,7 @@ function Farmer(sprites, grid) {
       }
     }
 
-    farmer.position.move(x, y);
+    if (farmer.position.free(x,y)) farmer.position.move(x, y);
     scheduleRender()
   }
 
