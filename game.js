@@ -9,6 +9,10 @@ var IMAGES = [
     "sheep.png"
 ]
 
+var EATING_RATE = 0.4
+var GROWING_RATE = 0.1
+var GRASS_MAX_LEVEL = 3
+
 var context = null
 var cameraPosition = {"x": 0, "y": 0}
 var grassHeights = []
@@ -27,7 +31,6 @@ function loadImages() {
         newImage.src = "resources/" + IMAGES[index]
         resources[IMAGES[index]] = newImage
     }
-    console.log(resources)
 }
 
 function scheduleRefresh() {
@@ -40,10 +43,17 @@ function Sheep(position) {
 
     self.position = position
     entities[position.x][position.y] = self
-    console.log(self.position)
 
     self.render = function() {
         context.drawImage(resources["sheep.png"], position.x * TILE_SIZE, position.y * TILE_SIZE)
+    }
+
+    self.step = function() {
+        var x = self.position.x
+        var y = self.position.y
+
+        // Eat the grass under the sheep
+        grassHeights[x][y] = Math.max(grassHeights[x][y] - EATING_RATE, 0)
     }
 
     return self
@@ -103,7 +113,7 @@ window.onload = function() {
     for (var x = 0; x < MAP_WIDTH; x++) {
         var column = []
         for (var y = 0; y < MAP_HEIGHT; y++) {
-            column.push(Math.floor(Math.random() * 4))
+            column.push(Math.random() * (GRASS_MAX_LEVEL + 1))
         }
         grassHeights.push(column)
     }
@@ -131,7 +141,7 @@ function gameRender() {
     context.translate(-cameraPosition.x, -cameraPosition.y)
     for (var x = minX; x < maxX; x++) {
         for (var y = minY; y < maxY; y++) {
-            var grassImage = "grass" + grassHeights[x][y] + ".png"
+            var grassImage = "grass" + Math.floor(grassHeights[x][y]) + ".png"
             context.drawImage(resources[grassImage], x * TILE_SIZE, y * TILE_SIZE)
 
             if (entities[x][y] !== null) {
@@ -143,5 +153,15 @@ function gameRender() {
 }
 
 function gameStep() {
-    console.log("Stepping game")
+    for (sheep in sheeps) {
+        sheeps[sheep].step()
+    }
+
+    for (var x = 0; x < MAP_WIDTH; x++) {
+        for (var y = 0; y < MAP_HEIGHT; y++) {
+            grassHeights[x][y] = Math.min(grassHeights[x][y] + GROWING_RATE, GRASS_MAX_LEVEL)
+        }
+    }
+
+    scheduleRefresh()
 }
