@@ -31,10 +31,14 @@ function Grid(width, height) {
     }
 
     this.free = function(x, y) {
-      if (x < 0 || y < 0 || x >= width || y >= height) return false;
+      if (!grid.inBounds(x,y)) return false;
       var taken = grid.taken[x][y];
       return taken < 0 || taken == id;
     }
+  }
+
+  this.inBounds = function(x, y) {
+    return x >= 0 && x < width && y >= 0 && y < height;
   }
 
   this.allocate = function(id, x, y) {
@@ -52,6 +56,11 @@ function Grid(width, height) {
   this.at = function(x, y) {
     if (x < 0 || y < 0 || x >= width || y >= height) return null;
     return this.taken[x][y]
+  }
+  
+  this.hasEntity = function(x, y) {
+    if (!this.inBounds(x,y)) return false;
+    return this.taken[x][y] != -1;
   }
 }
 

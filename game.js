@@ -63,18 +63,19 @@ function Farmer(sprites, grid) {
   var moveTo = function(offX, offY) {
     var x = farmer.position.x + offX
     var y = farmer.position.y + offY
-    if (farmer.position.free(x, y)) {
-      farmer.position.move(x, y);
-      scheduleRender()
-    } else {
+    if (!grid.inBounds(x,y)) return;
+
+    // Push out entities
+    if (grid.hasEntity(x, y)) {
       var entity = grid.at(x, y);
       var entityPos = grid.positions[entity]
       if (entityPos.free(x + offX, y + offY)) {
         entityPos.move(x + offX, y + offY)
-        farmer.position.move(x, y)
-        scheduleRender()
       }
     }
+
+    farmer.position.move(x, y);
+    scheduleRender()
   }
 
   this.handleKeyDown = function(event) {
