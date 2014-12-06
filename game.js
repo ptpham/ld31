@@ -6,6 +6,7 @@ var cameraPosition = {x: 0, y: 0}
 var resources = {}
 var grassHeights = []
 
+
 function generateGrass(width, height) {
   return onGrid(width, height, function() {
     return _.random(0, GRASS_MAX_LEVEL)
@@ -31,6 +32,24 @@ function Sprites(size, grid) {
   };
 }
 
+function Farmer(grid) {
+  this.entity = nextEntity++;
+  this.position = grid.allocate(this.entity, 0, 0);
+  sprites.fixed[this.entity] = resources["farmer.png"];
+
+  this.handleKeyDown = function(event) {
+    var x = this.position.x, y = this.position.y;
+    if (event.keyCode == 37) x--;
+    if (event.keyCode == 38) y--;
+    if (event.keyCode == 39) x++;
+    if (event.keyCode == 40) y++;
+    if (this.position.free(x,y)) {
+      this.position.move(x,y);
+      scheduleRender();
+    }
+  }
+}
+
 var grid = new Grid(MAP_WIDTH, MAP_HEIGHT);
 var sprites = new Sprites(TILE_SIZE, grid);
 var sheeps = new Sheeps(sprites, grid);
@@ -54,52 +73,15 @@ function generateEntities(width, height) {
 window.onload = function() {
   loadImages()
   grassHeights = generateGrass(MAP_WIDTH, MAP_HEIGHT)
+  farmer = new Farmer(grid)
   generateEntities(MAP_WIDTH, MAP_HEIGHT)
 
   window.onresize = scheduleRender
   window.setInterval(gameStep, STEP_DELAY)
+  window.onkeydown = _.bind(farmer.handleKeyDown, farmer)
 
   var canvas = document.getElementById("gameCanvas")
   context = canvas.getContext("2d")
-
-  var farmer = nextEntity++;
-  var farmerPos = grid.allocate(farmer, 0, 0);
-  sprites.fixed[farmer] = resources["farmer.png"];
-  window.onkeydown = function(event) {
-    var x = farmerPos.x, y = farmerPos.y;
-    if (event.keyCode == 37) x--;
-    if (event.keyCode == 38) y--;
-    if (event.keyCode == 39) x++;
-    if (event.keyCode == 40) y++;
-    if (farmerPos.free(x,y)) {
-      farmerPos.move(x,y);
-      scheduleRender();
-    }
-  }
-
-  var mousedown = false, lastX, lastY;
-  canvas.onmousedown = function(event) {
-    lastX = event.clientX;
-    lastY = event.clientY;
-    mousedown = true;
-  }
-
-  canvas.onmousemove = function(event) {
-    if (!mousedown) return;
-    cameraPosition.x += (lastX - event.clientX);
-    cameraPosition.y += (lastY - event.clientY);
-    lastX = event.clientX;
-    lastY = event.clientY;
-
-    cameraPosition.x = clamp(cameraPosition.x, 0,
-      TILE_SIZE * MAP_WIDTH - CANVAS_WIDTH);
-    cameraPosition.y = clamp(cameraPosition.y, 0,
-      TILE_SIZE * MAP_HEIGHT - CANVAS_HEIGHT);
-
-    scheduleRender();
-  }
-
-  canvas.onmouseleave = canvas.onmouseup = function() { mousedown = false; }
 
   scheduleRender()
 }
@@ -109,8 +91,20 @@ function scheduleRender() {
   window.setTimeout(gameRender, 0)
 }
 
+function positionCamera() {
+  cameraPosition.x = (farmer.position.x + 0.5) * TILE_SIZE - CANVAS_WIDTH / 2
+  cameraPosition.y = (farmer.position.y + 0.5) * TILE_SIZE - CANVAS_HEIGHT / 2
+
+  cameraPosition.x = clamp(cameraPosition.x, 0,
+    TILE_SIZE * MAP_WIDTH - CANVAS_WIDTH);
+  cameraPosition.y = clamp(cameraPosition.y, 0,
+    TILE_SIZE * MAP_HEIGHT - CANVAS_HEIGHT);
+}
+
 function gameRender() {
   if (!canvasDirty) return;
+
+  positionCamera()
   var minX = Math.max(Math.floor(cameraPosition.x / TILE_SIZE), 0);
   var minY = Math.max(Math.floor(cameraPosition.y / TILE_SIZE), 0);
   var maxX = Math.min(Math.ceil((cameraPosition.x + CANVAS_WIDTH) / TILE_SIZE), MAP_WIDTH);
