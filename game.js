@@ -131,7 +131,7 @@ function switchLevel(name) {
   freshLevel(level.width, level.height);
   farmer.position.move(level.farmer.x, level.farmer.y);
   grassWin = level.grassWin;
-  grassHeights = level.grass;
+  grassHeights = JSON.parse(JSON.stringify(level.grass));
   flowersDie = level.flowersDie;
 
   _.each(level.sheeps, function(s) {
@@ -187,7 +187,7 @@ window.onload = function() {
   });
 
   $(".overlay button").on("click", function() {
-    $(".overlay").hide();
+    $(".overlay").css("visibility", "hidden");
   });
 
   loadImages();
