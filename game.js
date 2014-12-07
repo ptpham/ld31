@@ -98,8 +98,6 @@ function freshLevel(width, height) {
   grassWin = 100;
   flowersDie = 0;
   gamePaused = true;
-  $(window).trigger("flowers:changed");
-  $(window).trigger("grass:eaten", 0);
 }
 
 function generateGrass(width, height) {

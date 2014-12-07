@@ -34,6 +34,8 @@ window.onload = function() {
 
   $("#overlayLevel").on("click", function() {
     gamePaused = false;
+    $(window).trigger("flowers:changed");
+    $(window).trigger("grass:eaten", 0);
   });
 
   $("#levelSelect").on("click", function() {
