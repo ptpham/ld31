@@ -18,12 +18,16 @@ function Sheeps(sprites, grid) {
   }
 
   this.step = function() {
+    var total = 0;
     _.each(this.entities, function(sheep, id) {
       var pos = grid.positions[id]; 
       var x = pos.x, y = pos.y;
 
       // Eat the grass under the sheep
-      grassHeights[x][y] = Math.max(grassHeights[x][y] - EATING_RATE, 0)
+      var oldHeight = grassHeights[x][y];
+      var newHeight = Math.max(oldHeight - EATING_RATE, 0);
+      total += oldHeight - newHeight;
+      grassHeights[x][y] = newHeight;
 
       // Possibly move the sheep
       if (Math.random() < SHEEP_MOVE_LIKELIHOOD) {
@@ -39,6 +43,7 @@ function Sheeps(sprites, grid) {
         if (choice) pos.move(choice.x, choice.y);
       }
     });
+    $(window).trigger("grass:eaten", total);
   }
 }
 

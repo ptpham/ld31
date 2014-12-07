@@ -93,6 +93,7 @@ var sprites = new Sprites(TILE_SIZE, grid);
 var sheeps = new Sheeps(sprites, grid);
 var flowers = new Flowers(sheeps, sprites, grid);
 var farmer = new Farmer(sprites, grid)
+var grassEaten = 0, grassTotal = 10;
 
 function loadImages() {
   IMAGES.forEach(function(fileName) {
@@ -120,6 +121,11 @@ window.onload = function() {
   window.onkeydown = _.bind(farmer.handleKeyDown, farmer)
   $(window).on("flowers:changed", function() {
     flowerCount.innerHTML = flowers.alive;
+  });
+  $(window).on("grass:eaten", function(e, g) {
+    grassEaten += g;
+    var percent = Math.min(grassEaten/grassTotal, 100);
+    $("#progressBar span").css("width", percent + "%");
   });
 
   loadImages();

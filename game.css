@@ -5,3 +5,17 @@ body {
 #gameCanvas {
     display: inline;
 }
+
+.progress {
+  display: inline-block;
+}
+
+#progressBar {
+  margin-right: 40px;
+  text-align: left;
+  border: 1px solid;
+}
+
+#uiBar {
+  margin-bottom: 10px;
+}
