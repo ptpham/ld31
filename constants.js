@@ -3,8 +3,6 @@ var STEP_DELAY = 1000
 var TILE_SIZE = 64
 var CANVAS_WIDTH = 800
 var CANVAS_HEIGHT = 600
-var MAP_WIDTH = 20
-var MAP_HEIGHT = 20
 
 var RESOURCES_PREFIX = "resources/"
 
