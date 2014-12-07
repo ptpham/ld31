@@ -70,6 +70,7 @@ function Farmer(sprites, grid) {
   }
 
   this.handleKeyDown = function(event) {
+    if (gameOver) return;
     var offX = 0, offY = 0;
     if (event.keyCode == 37) offX = -1;
     if (event.keyCode == 38) offY = -1;
@@ -187,7 +188,7 @@ function positionCamera() {
 }
 
 function gameRender() {
-  if (!canvasDirty ||  gameOver) return;
+  if (!canvasDirty) return;
 
   positionCamera()
   var minX = Math.max(Math.floor(cameraPosition.x / TILE_SIZE), 0);
@@ -211,6 +212,7 @@ function gameRender() {
 }
 
 function gameStep() {
+  if (gameOver) return;
   sheeps.step();
   flowers.step();
   onGrid(mapWidth, mapHeight, function(x,y) {

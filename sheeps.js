@@ -32,6 +32,7 @@ function Sheeps(sprites, grid) {
       grassHeights[x][y] = newHeight;
       if (eaten == 0) sheep.hunger++;
       else if (sheep.hunger > HUNGER_MIN) sheep.hunger--;
+      if (sheep.hunger > 0) sheep.hasTarget = false;
       total += eaten;
 
       // Move toward a grassy tile globally when it is hungry
