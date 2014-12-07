@@ -1,5 +1,8 @@
 body {
   text-align: center;
+  font-family: sans-serif;
+  background-color: black;
+  color: white;
 }
 
 #gameCanvas {
@@ -11,12 +14,57 @@ body {
 }
 
 #launchScreen {
-  background-color: blue;
+  background-color: black;
   display: inline-block;
   width: 800px;
   height: 600px;
+  position: relative;
 }
 
+#launchLogo {
+  position: absolute;
+  width: 500px;
+
+  animation-duration: 0.5s;
+  animation-name: flashyScale;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+
+  /* In case animations aren't supported */
+  width: 500px;
+  left: 150px;
+  bottom: 350px;
+}
+
+@keyframes flashyScale {
+  from {
+    width: 500px;
+    left: 150px;
+    bottom: 350px;
+  }
+
+  to {
+    width: 450px;
+    left: 175px;
+    bottom: 360px;
+  }
+}
+
+#instructions {
+  margin-top: 320px;
+}
+
+#instructions img {
+  height: 40px;
+  vertical-align: middle;
+}
+
+button {
+  color: white;
+  border-radius: 10px;
+  background-color: green;
+  font-size: 20px;
+}
 
 .progress {
   display: inline-block;
@@ -44,6 +92,7 @@ body {
 }
 
 .overlay > div {
+  color: black;
   background-color: white;
   padding: 20px 50px;
   border: 3px solid;
