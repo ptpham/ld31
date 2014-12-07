@@ -94,7 +94,7 @@ function freshLevel(width, height) {
   flowers = new Flowers(sheeps, sprites, grid);
   farmer = new Farmer(sprites, grid)
   grassEaten = 0;
-  grassWin = 10;
+  grassWin = 100;
   flowersDie = 0;
   gameOver = true;
   $(window).trigger("flowers:changed");
@@ -170,7 +170,7 @@ window.onload = function() {
   $(window).on("grass:eaten", function(e, g) {
     if (gameOver) return;
     grassEaten += g;
-    var percent = Math.min(grassEaten/grassWin, 100);
+    var percent = Math.min(100*grassEaten/grassWin, 100);
     $("#progressBar span").css("width", percent + "%");
     if (percent == 100) {
       $("#overlayWin").css("visibility", "visible");

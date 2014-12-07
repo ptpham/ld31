@@ -24,7 +24,7 @@ var LEVELS = {
     sheeps: [ {x: 1, y: 1 } ],
     flowers: [ {x: 4, y: 4 }],
     flowersDie: 0,
-    grassWin: 1,
+    grassWin: 10,
     grass: [
       [3, 3, 3, 3, 3],
       [3, 3, 3, 3, 3],
