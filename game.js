@@ -70,7 +70,7 @@ function Farmer(sprites, grid) {
   }
 
   this.handleKeyDown = function(event) {
-    if (gameOver) return;
+    if (gamePaused) return;
     var offX = 0, offY = 0;
     if (event.keyCode == 37) offX = -1;
     if (event.keyCode == 38) offY = -1;
@@ -81,7 +81,7 @@ function Farmer(sprites, grid) {
   }
 }
 
-var mapWidth, mapHeight, gameOver;
+var mapWidth, mapHeight, gamePaused;
 var grid, sprites, sheeps, flowers, farmer;
 var grassHeights, grassEaten, grassWin, flowersDie;
 
@@ -97,10 +97,9 @@ function freshLevel(width, height) {
   grassEaten = 0;
   grassWin = 100;
   flowersDie = 0;
-  gameOver = true;
+  gamePaused = true;
   $(window).trigger("flowers:changed");
   $(window).trigger("grass:eaten", 0);
-  gameOver = false;
 }
 
 function generateGrass(width, height) {
@@ -125,6 +124,7 @@ function randomLevel() {
   freshLevel(20, 20);
   grassHeights = generateGrass(mapWidth, mapHeight)
   generateEntities(mapWidth, mapHeight)
+  gamePaused = false;
 }
 
 function switchLevel(name) {
@@ -148,6 +148,9 @@ function switchLevel(name) {
   grassWin = level.grassWin;
   flowersDie = totalFlowers - level.flowersCanEat;
   $(window).trigger("flowers:changed");
+  $("#overlayLevel h1").html(level.name);
+  $("#overlayLevel").show();
+  scheduleRender();
 }
 
 function loadImages() {
@@ -168,7 +171,7 @@ function gameInit() {
   var canvas = document.getElementById("gameCanvas")
   context = canvas.getContext("2d")
 
-  randomLevel();
+  switchLevel("level0");
   scheduleRender()
 }
 
@@ -212,7 +215,7 @@ function gameRender() {
 }
 
 function gameStep() {
-  if (gameOver) return;
+  if (gamePaused) return;
   sheeps.step();
   flowers.step();
   onGrid(mapWidth, mapHeight, function(x,y) {

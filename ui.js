@@ -1,22 +1,22 @@
 window.onload = function() {
   $(window).on("flowers:changed", function() {
-    if (gameOver) return;
+    if (gamePaused) return;
     var remain = Math.max(flowers.alive - flowersDie, 0);
     flowerCount.innerHTML = remain;
     if (remain == 0) {
       $("#overlayLose").show();
-      gameOver = true;
+      gamePaused = true;
     }
   });
 
   $(window).on("grass:eaten", function(e, g) {
-    if (gameOver) return;
+    if (gamePaused) return;
     grassEaten += g;
     var percent = Math.min(100*grassEaten/grassWin, 100);
     $("#progressBar span").css("width", percent + "%");
     if (percent == 100) {
       $("#overlayWin").show();
-      gameOver = true;
+      gamePaused = true;
     }
   });
 
@@ -28,8 +28,21 @@ window.onload = function() {
     }
   });
 
-  $(".overlay button").on("click", function() {
-    $(".overlay").hide();
+  $(".overlay").on("click", function(e) {
+    if (e.target.tagName.toLowerCase() == "button") $(this).hide();
+  });
+
+  $("#overlayLevel").on("click", function() {
+    gamePaused = false;
+  });
+
+  $("#levelSelect").on("click", function() {
+    gamePaused = true;
+    $("#overlaySelect").show();
+  });
+
+  $("#resume").on("click", function() {
+    gamePaused = false;
   });
 
   $("#startGame").on("click", function() {

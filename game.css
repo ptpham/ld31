@@ -66,12 +66,16 @@ button {
   font-size: 20px;
 }
 
+button:hover {
+  background-color: lawngreen;
+}
+
 .progress {
   display: inline-block;
 }
 
 #progressBar {
-  margin-right: 40px;
+  margin-right: 10px;
   text-align: left;
   border: 1px solid;
 }
@@ -98,4 +102,8 @@ button {
   border: 3px solid;
   text-align: center;
   margin-top: 150px;
+}
+
+#levelSelect {
+  margin-right: 20px;
 }
