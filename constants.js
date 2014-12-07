@@ -19,7 +19,7 @@ var NUM_SHEEP = 20
 
 var LEVELS = { 
   level0: {
-    name: "Level 0: The Grove",
+    name: "Level 1: The Grove",
     flowersCanEat: 6,
     grassWin: 130,
     map: [
@@ -38,7 +38,7 @@ var LEVELS = {
     ]
   },
   level1: {
-    name: "Level 1: The Garden Path",
+    name: "Level 2: The Garden Path",
     flowersCanEat: 25,
     grassWin: 100,
     map: [
@@ -68,7 +68,7 @@ var LEVELS = {
     ]
   },
   level2: {
-    name: "Level 2: The Hedge Patio",
+    name: "Level 3: The Hedge Patio",
     flowersCanEat: 11,
     grassWin: 100,
     map: [
