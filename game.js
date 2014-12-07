@@ -96,6 +96,9 @@ function freshLevel(width, height) {
   grassEaten = 0;
   grassWin = 10;
   flowersDie = 0;
+
+  $(window).trigger("flowers:changed");
+  $(window).trigger("grass:eaten", 0);
 }
 
 function generateGrass(width, height) {
@@ -123,19 +126,18 @@ function randomLevel() {
 }
 
 function switchLevel(name) {
-  $.getJSON(name + ".json", function(data) {
-    freshLevel(data.width, data.height);
-    farmer.position.move(data.farmer.x, data.farmer.y);
-    grassWin = data.grassWin;
-    grassHeights = data.grass;
-    flowersDie = data.flowersDie;
+  var level = LEVELS[name];
+  freshLevel(level.width, level.height);
+  farmer.position.move(level.farmer.x, level.farmer.y);
+  grassWin = level.grassWin;
+  grassHeights = level.grass;
+  flowersDie = level.flowersDie;
 
-    _.each(data.sheeps, function(s) {
-      sheeps.allocate(s.x, s.y);
-    });
-    _.each(data.flowers, function(f) {
-      flowers.allocate(f.x, f.y);
-    });
+  _.each(level.sheeps, function(s) {
+    sheeps.allocate(s.x, s.y);
+  });
+  _.each(level.flowers, function(f) {
+    flowers.allocate(f.x, f.y);
   });
 }
 
@@ -162,13 +164,19 @@ window.onload = function() {
     var percent = Math.min(grassEaten/grassWin, 100);
     $("#progressBar span").css("width", percent + "%");
   });
+  $(".levelSwitch").on("click", function() {
+    if (this.id == "levelRandom") {
+      randomLevel();
+    } else {
+      switchLevel(this.id);
+    }
+  });
 
   loadImages();
   var canvas = document.getElementById("gameCanvas")
   context = canvas.getContext("2d")
 
   randomLevel();
-  switchLevel("level0");
   scheduleRender()
 }
 
