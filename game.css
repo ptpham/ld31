@@ -1,10 +1,22 @@
 body {
-    text-align: center;
+  text-align: center;
 }
 
 #gameCanvas {
-    display: inline;
+  display: inline-block;
 }
+
+#gameScreen {
+  display: none;
+}
+
+#launchScreen {
+  background-color: blue;
+  display: inline-block;
+  width: 800px;
+  height: 600px;
+}
+
 
 .progress {
   display: inline-block;

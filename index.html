@@ -11,26 +11,32 @@
         <script src="sheeps.js"></script>
         <script src="flowers.js"></script>
         <script src="game.js"></script>
+        <script src="ui.js"></script>
     </head>
     <body>
-      <div id="overlayLose" class="overlay">
-        <div><h1>You Lose!</h1><button>ok...</button></div>
+      <div id="launchScreen">
+        <button id="startGame">Start!</button>
       </div>
-      <div id="overlayWin" class="overlay">
-        <div><h1>You Win!</h1><button>OK!</button></div>
+      <div id="gameScreen">
+        <div id="overlayLose" class="overlay">
+          <div><h1>You Lose!</h1><button>ok...</button></div>
+        </div>
+        <div id="overlayWin" class="overlay">
+          <div><h1>You Win!</h1><button>OK!</button></div>
+        </div>
+        <div id="uiBar">
+          <button id="levelRandom" class="levelSwitch">Random!</button>
+          <button id="level0" class="levelSwitch">Level 0</button>
+          <button id="level1" class="levelSwitch">Level 1</button>
+          <button id="level2" class="levelSwitch">Level 2</button>
+          Grass Cut: <span id="progressBar" class="progress" style="width: 400px">
+            <span class="progress" style="background-color: green; width: 0px;">&nbsp;</span>
+          </span>
+          Flower Count: <span id="flowerCount">0</span>
+        </div>
+        <canvas id="gameCanvas" width="800" height="600">
+            Sorry, your browser does not support the canvas element.
+        </canvas>
       </div>
-      <div id="uiBar">
-        <button id="levelRandom" class="levelSwitch">Random!</button>
-        <button id="level0" class="levelSwitch">Level 0</button>
-        <button id="level1" class="levelSwitch">Level 1</button>
-        <button id="level2" class="levelSwitch">Level 2</button>
-        Grass Cut: <span id="progressBar" class="progress" style="width: 400px">
-          <span class="progress" style="background-color: green; width: 0px;">&nbsp</span>
-        </span>
-        Flower Count: <span id="flowerCount">0</span>
-      </div>
-      <canvas id="gameCanvas" width="800" height="600">
-          Sorry, your browser does not support the canvas element.
-      </canvas>
     </body>
 </html>
