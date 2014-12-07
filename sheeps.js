@@ -6,7 +6,7 @@ function Sheeps(sprites, grid) {
   this.entities = {};
   this.allocate = function(x, y) {
     var id = nextEntity++;
-    this.entities[id] = {};
+    this.entities[id] = { hunger: 0 };
     var pos = grid.allocate(id, x, y);
     sprites.addFixed(id, "sheep.png", 4);
     return id;
@@ -27,11 +27,47 @@ function Sheeps(sprites, grid) {
       // Eat the grass under the sheep
       var oldHeight = grassHeights[x][y];
       var newHeight = Math.max(oldHeight - EATING_RATE, 0);
-      total += oldHeight - newHeight;
+      var eaten = oldHeight - newHeight;
       grassHeights[x][y] = newHeight;
+      if (eaten == 0) sheep.hunger++;
+      else sheep.hunger--;
+      total += eaten;
 
-      // Possibly move the sheep
-      if (Math.random() < SHEEP_MOVE_LIKELIHOOD) {
+      // Move toward a grassy tile globally when it is hungry
+      var moved = false;
+      if (sheep.hunger > 0) {
+        if (!sheep.hasTarget) {
+          var x = _.random(grid.width-1);
+          var y = _.random(grid.height-1);
+          if (grassHeights[x][y] > 1) {
+            sheep.hasTarget = true;
+            sheep.targetX = x;
+            sheep.targetY = y;
+          }
+        } else {
+          var dx = sheep.targetX - x;
+          var dy = sheep.targetY - y;
+          if (dx == 0 && dy == 0) sheep.hasTarget = false;
+          var directionX = Math.abs(dx) > Math.abs(dy);
+          var delta = directionX ? dx : dy;
+          var sign = delta > 0 ? 1 : -1;
+          if (directionX) x += sign;
+          else y += sign;
+
+          // If the sheep can't make any progress toward its goal,
+          // it gives up and tries to find another target in the future.
+          if (pos.free(x, y)) {
+            pos.move(x, y);
+            moved = true;
+          } else sheep.hasTarget = false;
+        }
+      }
+
+      // Move the sheep when it didn't make any progress to where it wanted to
+      // go or when it's not hungry and it randomlly feels like it.
+      var x = pos.x, y = pos.y;
+      if ((sheep.hunger > 0 && !moved) ||
+        (sheep.hunger <= 0 && Math.random() < SHEEP_MOVE_LIKELIHOOD)) {
         var possiblePositions = ALLOWED_MOVES.map(function(offset) {
           return {x: offset.x + x, y: offset.y + y}
         }).filter(function(target) {
@@ -43,7 +79,9 @@ function Sheeps(sprites, grid) {
         });
         if (choice) pos.move(choice.x, choice.y);
       }
+
     });
+
     $(window).trigger("grass:eaten", total);
   }
 }
