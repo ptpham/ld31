@@ -36,7 +36,7 @@ function Sheeps(sprites, grid) {
         var choice = rouletteSelection(possiblePositions, function(target) {
           return grassHeights[target.x][target.y];
         });
-        pos.move(choice.x, choice.y);
+        if (choice) pos.move(choice.x, choice.y);
       }
     });
   }
