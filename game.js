@@ -128,18 +128,25 @@ function randomLevel() {
 
 function switchLevel(name) {
   var level = LEVELS[name];
-  freshLevel(level.width, level.height);
-  farmer.position.move(level.farmer.x, level.farmer.y);
-  grassWin = level.grassWin;
-  grassHeights = JSON.parse(JSON.stringify(level.grass));
-  flowersDie = level.flowersDie;
+  var width = level.map.length;
+  var height = level.map[0].length;
+  freshLevel(width, height);
 
-  _.each(level.sheeps, function(s) {
-    sheeps.allocate(s.x, s.y);
+  var totalFlowers = 0;
+  onGrid(width, height, function(x,y) {
+    var cell = level.map[x][y];
+    grassHeights[x][y] = parseInt(cell[0]);
+    if (cell[1] == 'm') farmer.position.move(x, y);
+    else if (cell[1] == 's') sheeps.allocate(x, y);
+    else if (cell[1] == 'f') {
+      flowers.allocate(x, y);
+      totalFlowers++;
+    }
   });
-  _.each(level.flowers, function(f) {
-    flowers.allocate(f.x, f.y);
-  });
+
+  grassWin = level.grassWin;
+  flowersDie = totalFlowers - level.flowersCanEat;
+  $(window).trigger("flowers:changed");
 }
 
 function loadImages() {
@@ -180,7 +187,7 @@ function positionCamera() {
 }
 
 function gameRender() {
-  if (!canvasDirty) return;
+  if (!canvasDirty ||  gameOver) return;
 
   positionCamera()
   var minX = Math.max(Math.floor(cameraPosition.x / TILE_SIZE), 0);

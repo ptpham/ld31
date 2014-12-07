@@ -1,5 +1,5 @@
 function Sheeps(sprites, grid) {
-  var SHEEP_MOVE_LIKELIHOOD = 0.1
+  var SHEEP_MOVE_LIKELIHOOD = 0.5
   var EATING_RATE = 0.4
 
   var sheeps = this;
@@ -39,7 +39,7 @@ function Sheeps(sprites, grid) {
         })
 
         var choice = rouletteSelection(possiblePositions, function(target) {
-          return grassHeights[target.x][target.y];
+          return grassHeights[target.x][target.y] + 1;
         });
         if (choice) pos.move(choice.x, choice.y);
       }
