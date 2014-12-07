@@ -1,6 +1,7 @@
 function Sheeps(sprites, grid) {
   var SHEEP_MOVE_LIKELIHOOD = 0.5
   var EATING_RATE = 0.4
+  var HUNGER_MIN = 0;
 
   var sheeps = this;
   this.entities = {};
@@ -30,7 +31,7 @@ function Sheeps(sprites, grid) {
       var eaten = oldHeight - newHeight;
       grassHeights[x][y] = newHeight;
       if (eaten == 0) sheep.hunger++;
-      else sheep.hunger--;
+      else if (sheep.hunger > HUNGER_MIN) sheep.hunger--;
       total += eaten;
 
       // Move toward a grassy tile globally when it is hungry
