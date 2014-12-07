@@ -4,7 +4,7 @@ window.onload = function() {
     var remain = Math.max(flowers.alive - flowersDie, 0);
     flowerCount.innerHTML = remain;
     if (remain == 0) {
-      $("#overlayLose").css("visibility", "visible");
+      $("#overlayLose").show();
       gameOver = true;
     }
   });
@@ -15,7 +15,7 @@ window.onload = function() {
     var percent = Math.min(100*grassEaten/grassWin, 100);
     $("#progressBar span").css("width", percent + "%");
     if (percent == 100) {
-      $("#overlayWin").css("visibility", "visible");
+      $("#overlayWin").show();
       gameOver = true;
     }
   });
@@ -29,7 +29,7 @@ window.onload = function() {
   });
 
   $(".overlay button").on("click", function() {
-    $(".overlay").css("visibility", "hidden");
+    $(".overlay").hide();
   });
 
   $("#startGame").on("click", function() {
