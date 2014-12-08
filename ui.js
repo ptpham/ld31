@@ -50,7 +50,8 @@ window.onload = function() {
   });
 
   $("#nextLevel").on("click", function() {
-    switchLevel(currentLevel.next);
+    if (currentLevel != null) switchLevel(currentLevel.next);
+    else randomLevel();
   });
 
   $("#retry").on("click", function() {
