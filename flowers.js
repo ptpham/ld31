@@ -19,8 +19,6 @@ function Flowers(sheeps, sprites, grid) {
     delete this.entities[id];
     delete grid.positions[id];
     sprites.removeFixed(id);
-    this.alive--;
-    $(window).trigger("flowers:changed");
   }
 
   this.step = function() {
@@ -29,6 +27,8 @@ function Flowers(sheeps, sprites, grid) {
       var other = grid.taken[pos.x][pos.y];
       if (other in sheeps.entities) { 
         sprites.addFixed(id, "shrub_eaten.png", 0);
+        this.alive--;
+        $(window).trigger("flowers:changed");
       }
     });
   }
