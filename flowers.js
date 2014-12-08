@@ -25,9 +25,10 @@ function Flowers(sheeps, sprites, grid) {
     _.each(this.entities, function(flower, id) {
       var pos = grid.positions[id];
       var other = grid.taken[pos.x][pos.y];
-      if (other in sheeps.entities) { 
+      if (other in sheeps.entities && !flower.dead) { 
         sprites.addFixed(id, "shrub_eaten.png", 0);
         flowers.alive--;
+        flower.dead = true;
         $(window).trigger("flowers:changed");
       }
     });
