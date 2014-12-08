@@ -22,7 +22,7 @@ var LEVELS = {
   levelpre: {
     next: "level0",
     name: "Level 0: Training Grounds",
-    flowersCanEat: 3,
+    flowersCanEat: 1,
     grassWin: 100,
     map: [
       ["3s", "3s", "30", "30", "30", "30", "3s", "3s"],
