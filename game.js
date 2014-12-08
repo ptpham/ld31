@@ -90,6 +90,7 @@ var grid, sprites, sheeps, flowers, farmer;
 var grassHeights, grassEaten, grassWin, flowersDie;
 
 function freshLevel(width, height) {
+  currentLevel = null;
   mapWidth = width;
   mapHeight = height;
   grassHeights = constantGrid(mapWidth, mapWidth, 0);
@@ -130,10 +131,16 @@ function randomLevel() {
 }
 
 function switchLevel(name) {
+  if (name == "random") {
+    randomLevel();
+    return;
+  }
+
   var level = LEVELS[name];
   var width = level.map.length;
   var height = level.map[0].length;
   freshLevel(width, height);
+  level.id = name;
 
   var totalFlowers = 0;
   onGrid(width, height, function(x,y) {
@@ -152,6 +159,7 @@ function switchLevel(name) {
   $(window).trigger("flowers:changed");
   $("#overlayLevel h1").html(level.name);
   $("#overlayLevel").show();
+  currentLevel = level;
   scheduleRender();
 }
 

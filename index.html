@@ -27,10 +27,10 @@
       </div>
       <div id="gameScreen">
         <div id="overlayLose" class="overlay">
-          <div><h1>You Lose!</h1><button>ok...</button></div>
+          <div><h1>You Lose!</h1><button id="retry">Retry</button><button class="levelSelector">Levels</button></div>
         </div>
         <div id="overlayWin" class="overlay">
-          <div><h1>You Win!</h1><button>OK!</button></div>
+          <div><h1>You Win!</h1><button id="nextLevel">Next Level</button></div>
         </div>
         <div id="overlaySelect" class="overlay">
           <div>
@@ -46,7 +46,7 @@
           <div><h1>Level Name</h1><button>Ready!</button></div>
         </div>
         <div id="uiBar">
-          <button id="levelSelect">Levels</button>
+          <button id="levelSelect" class="levelSelector">Levels</button>
           Grass Cut: <span id="progressBar" class="progress" style="width: 400px">
             <span class="progress" style="background-color: green; width: 0px;">&nbsp;</span>
           </span>

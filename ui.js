@@ -38,13 +38,21 @@ window.onload = function() {
     $(window).trigger("grass:eaten", 0);
   });
 
-  $("#levelSelect").on("click", function() {
+  $(".levelSelector").on("click", function() {
     gamePaused = true;
     $("#overlaySelect").show();
   });
 
   $("#resume").on("click", function() {
     gamePaused = false;
+  });
+
+  $("#nextLevel").on("click", function() {
+    switchLevel(currentLevel.next);
+  });
+
+  $("#retry").on("click", function() {
+    switchLevel(currentLevel.id);
   });
 
   $("#startGame").on("click", function() {
