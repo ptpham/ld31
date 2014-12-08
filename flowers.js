@@ -27,7 +27,7 @@ function Flowers(sheeps, sprites, grid) {
       var other = grid.taken[pos.x][pos.y];
       if (other in sheeps.entities) { 
         sprites.addFixed(id, "shrub_eaten.png", 0);
-        this.alive--;
+        flowers.alive--;
         $(window).trigger("flowers:changed");
       }
     });
