@@ -11,7 +11,7 @@ var IMAGES = [
   "flower_blue.png",
   "shrub_blue.png", "shrub_orange.png", "shrub_maroon.png", "shrub_eaten.png",
   "farmer.png", "farmer0.png", "farmer1.png", "farmer2.png", "farmer3.png",
-  "sheep.png",
+  "sheep.png", "sheep1.png"
 ]
 
 var GROWING_RATE = 0.0

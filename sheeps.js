@@ -35,6 +35,10 @@ function Sheeps(sprites, grid) {
       if (sheep.hunger > 0) sheep.hasTarget = false;
       total += eaten;
 
+      if (sheep.hunger == 0 && Math.random() < 0.3) {
+        sprites.addFixed(id, "sheep1.png", 4);
+      } else sprites.addFixed(id, "sheep.png", 4);
+
       // Move toward a grassy tile globally when it is hungry
       var moved = false;
       if (sheep.hunger > 0) {
