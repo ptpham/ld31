@@ -77,7 +77,11 @@ function Farmer(sprites, grid) {
     if (event.keyCode == 39) offX = 1;
     if (event.keyCode == 40) offY = 1;
 
-    if (offX != 0 || offY != 0) moveTo(offX, offY)
+    if (offX != 0 || offY != 0) {
+      moveTo(offX, offY)
+      var frame = _.random(3);
+      sprites.addFixed(this.entity, "farmer" + frame + ".png", 4);
+    }
   }
 }
 

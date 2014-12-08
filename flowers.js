@@ -7,7 +7,8 @@ function Flowers(sheeps, sprites, grid) {
   this.allocate = function(x, y) {
     var id = nextEntity++;
     this.entities[id] = { };
-    sprites.addFixed(id, "flower_blue.png", 0);
+    var color = _.sample(["blue", "maroon", "orange"]);
+    sprites.addFixed(id, "shrub_" + color + ".png", 0);
     grid.positions[id] = { x: x, y: y };
     this.alive++;
     $(window).trigger("flowers:changed");
@@ -26,8 +27,8 @@ function Flowers(sheeps, sprites, grid) {
     _.each(this.entities, function(flower, id) {
       var pos = grid.positions[id];
       var other = grid.taken[pos.x][pos.y];
-      if (other in sheeps.entities) {
-        flowers.deallocate(id);
+      if (other in sheeps.entities) { 
+        sprites.addFixed(id, "shrub_eaten.png", 0);
       }
     });
   }

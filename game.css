@@ -1,7 +1,7 @@
 body {
   text-align: center;
   font-family: sans-serif;
-  background-color: black;
+  background-color: #333340;
   color: white;
 }
 
@@ -14,7 +14,7 @@ body {
 }
 
 #launchScreen {
-  background-color: black;
+  background-color: #333340;
   display: inline-block;
   width: 800px;
   height: 600px;

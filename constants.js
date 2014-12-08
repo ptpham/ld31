@@ -9,8 +9,9 @@ var RESOURCES_PREFIX = "resources/"
 var IMAGES = [
   "grass0.png", "grass1.png", "grass2.png", "grass3.png",
   "flower_blue.png",
+  "shrub_blue.png", "shrub_orange.png", "shrub_maroon.png", "shrub_eaten.png",
+  "farmer.png", "farmer0.png", "farmer1.png", "farmer2.png", "farmer3.png",
   "sheep.png",
-  "farmer.png"
 ]
 
 var GROWING_RATE = 0.0
