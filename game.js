@@ -181,7 +181,7 @@ function gameInit() {
   var canvas = document.getElementById("gameCanvas")
   context = canvas.getContext("2d")
 
-  switchLevel("level0");
+  switchLevel("levelpre");
   scheduleRender()
 }
 
