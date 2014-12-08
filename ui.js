@@ -32,10 +32,12 @@ window.onload = function() {
     if (e.target.tagName.toLowerCase() == "button") $(this).hide();
   });
 
-  $("#overlayLevel").on("click", function() {
-    gamePaused = false;
-    $(window).trigger("flowers:changed");
-    $(window).trigger("grass:eaten", 0);
+  $("#overlayLevel").on("click", function(e) {
+    if (e.target.tagName.toLowerCase() == "button") {
+      gamePaused = false;
+      $(window).trigger("flowers:changed");
+      $(window).trigger("grass:eaten", 0);
+    }
   });
 
   $(".levelSelector").on("click", function() {
