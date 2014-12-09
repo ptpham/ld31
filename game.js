@@ -76,6 +76,7 @@ function Farmer(sprites, grid) {
     if (event.keyCode == 38) offY = -1;
     if (event.keyCode == 39) offX = 1;
     if (event.keyCode == 40) offY = 1;
+    event.preventDefault();
 
     if (offX != 0 || offY != 0) {
       moveTo(offX, offY)
