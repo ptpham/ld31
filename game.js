@@ -213,8 +213,8 @@ function gameRender() {
   context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   context.translate(-cameraPosition.x, -cameraPosition.y)
   for (var x = minX; x < maxX; x++) {
-    for (var y = minY; y < maxY; y++) {
-      var grassImage = "grass" + Math.floor(grassHeights[x][y]) + ".png"
+    for (var y = minY; y < maxY; y++) { 
+      var grassImage = "grass" + Math.ceil(grassHeights[x][y]) + ".png"
       context.drawImage(resources[grassImage], x * TILE_SIZE, y * TILE_SIZE)
     }
   }
